@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -84,6 +85,32 @@ func New(clientCtx client.Context, logger log.Logger) *Server {
 	}
 }
 
+// heightMiddleware parses height query parameter and sets GRPCBlockHeightHeader
+func heightMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		heightStr := r.FormValue("height")
+		if heightStr != "" {
+			height, err := strconv.ParseInt(heightStr, 10, 64)
+
+			if err != nil {
+				writeErrorResponse(w, http.StatusBadRequest, "syntax error")
+				return
+			}
+
+			if height < 0 {
+				writeErrorResponse(w, http.StatusBadRequest, "height must be equal or greater than zero")
+				return
+			}
+
+			if height > 0 {
+				r.Header.Set(grpctypes.GRPCBlockHeightHeader, heightStr)
+			}
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 // Start starts the API server. Internally, the API server leverages Tendermint's
 // JSON RPC server. Configuration options are provided via config.APIConfig
 // and are delegated to the Tendermint JSON RPC server. The process is
@@ -105,7 +132,7 @@ func (s *Server) Start(cfg config.Config) error {
 
 	s.registerGRPCGatewayRoutes()
 	s.listener = listener
-	var h http.Handler = s.Router
+	h := heightMiddleware(s.Router)
 
 	s.mtx.Unlock()
 
@@ -115,7 +142,7 @@ func (s *Server) Start(cfg config.Config) error {
 	}
 
 	s.logger.Info("starting API server...")
-	return tmrpcserver.Serve(s.listener, s.Router, s.logger, tmCfg)
+	return tmrpcserver.Serve(s.listener, h, s.logger, tmCfg)
 }
 
 // Close closes the API server.
