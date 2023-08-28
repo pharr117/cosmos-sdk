@@ -85,8 +85,8 @@ func New(clientCtx client.Context, logger log.Logger) *Server {
 	}
 }
 
-// heightMiddleware parses height query parameter and sets GRPCBlockHeightHeader
-func heightMiddleware(next http.Handler) http.Handler {
+// blockHeightMiddleware parses height query parameter and sets GRPCBlockHeightHeader
+func blockHeightMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		heightStr := r.FormValue("height")
 		if heightStr != "" {
@@ -132,7 +132,7 @@ func (s *Server) Start(cfg config.Config) error {
 
 	s.registerGRPCGatewayRoutes()
 	s.listener = listener
-	h := heightMiddleware(s.Router)
+	h := blockHeightMiddleware(s.Router)
 
 	s.mtx.Unlock()
 
