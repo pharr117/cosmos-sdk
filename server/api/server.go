@@ -91,7 +91,6 @@ func blockHeightMiddleware(next http.Handler) http.Handler {
 		heightStr := r.FormValue("height")
 		if heightStr != "" {
 			height, err := strconv.ParseInt(heightStr, 10, 64)
-
 			if err != nil {
 				writeErrorResponse(w, http.StatusBadRequest, "syntax error")
 				return
