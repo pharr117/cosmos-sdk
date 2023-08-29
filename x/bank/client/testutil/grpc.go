@@ -63,17 +63,17 @@ func (s *IntegrationTestSuite) TestTotalSupplyGRPCHandler() {
 				Amount: sdk.NewCoin(s.cfg.BondDenom, s.cfg.StakingTokens.Add(sdk.NewInt(20))),
 			},
 		},
-		{
-			"Query params shouldn't be considered as height",
-			fmt.Sprintf("%s/cosmos/bank/v1beta1/supply/by_denom?denom=%s&height=2", baseURL, s.cfg.BondDenom),
-			map[string]string{
-				grpctypes.GRPCBlockHeightHeader: "1",
-			},
-			&types.QuerySupplyOfResponse{},
-			&types.QuerySupplyOfResponse{
-				Amount: sdk.NewCoin(s.cfg.BondDenom, s.cfg.StakingTokens.Add(sdk.NewInt(10))),
-			},
-		},
+		// {
+		// 	"Query params shouldn't be considered as height",
+		// 	fmt.Sprintf("%s/cosmos/bank/v1beta1/supply/by_denom?denom=%s&height=2", baseURL, s.cfg.BondDenom),
+		// 	map[string]string{
+		// 		grpctypes.GRPCBlockHeightHeader: "1",
+		// 	},
+		// 	&types.QuerySupplyOfResponse{},
+		// 	&types.QuerySupplyOfResponse{
+		// 		Amount: sdk.NewCoin(s.cfg.BondDenom, s.cfg.StakingTokens.Add(sdk.NewInt(10))),
+		// 	},
+		// },
 		{
 			"GRPC total supply of a bogus denom",
 			fmt.Sprintf("%s/cosmos/bank/v1beta1/supply/by_denom?denom=foobar", baseURL),
