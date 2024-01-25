@@ -11,6 +11,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
+const ColumbusChainID = "columbus-5"
+
 // GetDelegation returns a specific delegation.
 func (k Keeper) GetDelegation(ctx sdk.Context, delAddr sdk.AccAddress, valAddr sdk.ValAddress) (delegation types.Delegation, found bool) {
 	store := ctx.KVStore(k.storeKey)
@@ -656,6 +658,30 @@ func (k Keeper) Delegate(
 	}
 
 	delegatorAddress := sdk.MustAccAddressFromBech32(delegation.DelegatorAddress)
+
+	// If Delegations are allowed again, limit validator power to 20%
+	if ctx.ChainID() == ColumbusChainID {
+		// Get the last Total Power of the validator set
+		lastPower := k.GetLastTotalPower(ctx)
+
+		// Get the power of the current validator power
+		validatorLastPower := sdk.TokensToConsensusPower(validator.Tokens, k.PowerReduction(ctx))
+
+		// Get the new power of the validator if delegated the bond amount
+		validatorNewPower := validatorLastPower + sdk.TokensToConsensusPower(bondAmt, k.PowerReduction(ctx))
+
+		// Compute what the Total Consensus Power would be if this Delegation goes through
+		newTotalPower := lastPower.Int64() + sdk.TokensToConsensusPower(bondAmt, k.PowerReduction(ctx))
+
+		// Compute what the new Validator voting power would be in relation to the new total power
+		// validatorIncreasedDelegationPercent := float32(validatorNewPower) / float32(newTotalPower)
+		validatorIncreasedDelegationPercent := sdk.NewDec(validatorNewPower).QuoInt64(newTotalPower)
+
+		// If Delegations are allowed, and the Delegation would have increased the Validator to over 20% of the staking power, do not allow the Delegation to proceed
+		if validatorIncreasedDelegationPercent.GT(sdk.NewDecWithPrec(20, 2)) {
+			panic("validator power is over the allowed limit")
+		}
+	}
 
 	// if subtractAccount is true then we are
 	// performing a delegation and not a redelegation, thus the source tokens are
