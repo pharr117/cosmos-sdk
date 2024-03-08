@@ -36,7 +36,8 @@ const (
 	commitInfoKeyFmt = "s/%d" // s/<version>
 )
 
-const iavlDisablefastNodeDefault = false
+// TODO: really true?
+const iavlDisablefastNodeDefault = true
 
 // keysForStoreKeyMap returns a slice of keys for the provided map lexically sorted by StoreKey.Name()
 func keysForStoreKeyMap[V any](m map[types.StoreKey]V) []types.StoreKey {
@@ -636,6 +637,7 @@ func (rs *Store) PruneStores(clearPruningManager bool, pruningHeights []int64) (
 			continue
 		}
 
+		rs.logger.Debug("pruning store", "store", key)
 		store = rs.GetCommitKVStore(key)
 
 		err := store.(*iavl.Store).DeleteVersions(pruningHeights...)
