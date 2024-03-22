@@ -17,6 +17,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
+const ColumbusChainID = "columbus-5"
+
 type msgServer struct {
 	*Keeper
 }

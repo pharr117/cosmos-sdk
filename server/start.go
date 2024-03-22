@@ -31,6 +31,8 @@ import (
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	servergrpc "github.com/cosmos/cosmos-sdk/server/grpc"
 	"github.com/cosmos/cosmos-sdk/server/types"
+	"github.com/cosmos/cosmos-sdk/store/cache"
+	"github.com/cosmos/cosmos-sdk/store/iavl"
 	pruningtypes "github.com/cosmos/cosmos-sdk/store/pruning/types"
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -41,18 +43,19 @@ import (
 
 const (
 	// Tendermint full-node start flags
-	flagWithTendermint     = "with-tendermint"
-	flagAddress            = "address"
-	flagTransport          = "transport"
-	flagTraceStore         = "trace-store"
-	flagCPUProfile         = "cpu-profile"
-	FlagMinGasPrices       = "minimum-gas-prices"
-	FlagHaltHeight         = "halt-height"
-	FlagHaltTime           = "halt-time"
-	FlagInterBlockCache    = "inter-block-cache"
-	FlagUnsafeSkipUpgrades = "unsafe-skip-upgrades"
-	FlagTrace              = "trace"
-	FlagInvCheckPeriod     = "inv-check-period"
+	flagWithTendermint      = "with-tendermint"
+	flagAddress             = "address"
+	flagTransport           = "transport"
+	flagTraceStore          = "trace-store"
+	flagCPUProfile          = "cpu-profile"
+	FlagMinGasPrices        = "minimum-gas-prices"
+	FlagHaltHeight          = "halt-height"
+	FlagHaltTime            = "halt-time"
+	FlagInterBlockCache     = "inter-block-cache"
+	FlagInterBlockCacheSize = "inter-block-cache-size"
+	FlagUnsafeSkipUpgrades  = "unsafe-skip-upgrades"
+	FlagTrace               = "trace"
+	FlagInvCheckPeriod      = "inv-check-period"
 
 	FlagPruning             = "pruning"
 	FlagPruningKeepRecent   = "pruning-keep-recent"
@@ -172,6 +175,7 @@ is performed. Note, when enabled, gRPC will also be automatically enabled.
 	cmd.Flags().Uint64(FlagHaltHeight, 0, "Block height at which to gracefully halt the chain and shutdown the node")
 	cmd.Flags().Uint64(FlagHaltTime, 0, "Minimum block time (in Unix seconds) at which to gracefully halt the chain and shutdown the node")
 	cmd.Flags().Bool(FlagInterBlockCache, true, "Enable inter-block caching")
+	cmd.Flags().Uint(FlagInterBlockCacheSize, cache.DefaultCommitKVStoreCacheSize, "The size of inter-block caching store")
 	cmd.Flags().String(flagCPUProfile, "", "Enable CPU profiling and write to the provided file")
 	cmd.Flags().Bool(FlagTrace, false, "Provide full stack traces for errors in ABCI Log")
 	cmd.Flags().String(FlagPruning, pruningtypes.PruningOptionDefault, "Pruning strategy (default|nothing|everything|custom)")
@@ -179,6 +183,7 @@ is performed. Note, when enabled, gRPC will also be automatically enabled.
 	cmd.Flags().Uint64(FlagPruningInterval, 0, "Height interval at which pruned heights are removed from disk (ignored if pruning is not 'custom')")
 	cmd.Flags().Uint(FlagInvCheckPeriod, 0, "Assert registered invariants every N blocks")
 	cmd.Flags().Uint64(FlagMinRetainBlocks, 0, "Minimum block height offset during ABCI commit to prune Tendermint blocks")
+	cmd.Flags().Uint64(FlagIAVLCacheSize, iavl.DefaultIAVLCacheSize, "The size of iavl caching store")
 
 	cmd.Flags().Bool(FlagAPIEnable, false, "Define if the API server should be enabled")
 	cmd.Flags().Bool(FlagAPISwagger, false, "Define if swagger documentation should automatically be registered (Note: the API must also be enabled)")
@@ -199,7 +204,7 @@ is performed. Note, when enabled, gRPC will also be automatically enabled.
 	cmd.Flags().Uint64(FlagStateSyncSnapshotInterval, 0, "State sync snapshot interval")
 	cmd.Flags().Uint32(FlagStateSyncSnapshotKeepRecent, 2, "State sync snapshot to keep")
 
-	cmd.Flags().Bool(FlagDisableIAVLFastNode, false, "Disable fast node for IAVL tree")
+	cmd.Flags().Bool(FlagDisableIAVLFastNode, true, "Disable fast node for IAVL tree")
 
 	cmd.Flags().Int(FlagMempoolMaxTxs, mempool.DefaultMaxTx, "Sets MaxTx value for the app-side mempool")
 
