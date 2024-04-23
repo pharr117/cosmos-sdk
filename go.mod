@@ -1,4 +1,4 @@
-go 1.19
+go 1.20
 
 module github.com/cosmos/cosmos-sdk
 
@@ -186,8 +186,7 @@ require (
 replace (
 	// use cosmos fork of keyring
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
-	// use cometbft
-	github.com/cometbft/cometbft => github.com/Genuine-labs/terra-classic-cometbft v0.37.4-classic
+	github.com/cometbft/cometbft => github.com/classic-terra/cometbft v0.37.4-classic
 	// dgrijalva/jwt-go is deprecated and doesn't receive security updates.
 	// TODO: remove it: https://github.com/cosmos/cosmos-sdk/issues/13134
 	github.com/dgrijalva/jwt-go => github.com/golang-jwt/jwt/v4 v4.4.2
@@ -200,18 +199,4 @@ replace (
 	golang.org/x/exp => golang.org/x/exp v0.0.0-20230711153332-06a737ee72cb
 	// stick with compatible version of rapid in v0.47.x line
 	pgregory.net/rapid => pgregory.net/rapid v0.5.5
-)
-
-retract (
-	// revert fix https://github.com/cosmos/cosmos-sdk/pull/16331
-	v0.46.12
-	// subject to a bug in the group module and gov module migration
-	[v0.46.5, v0.46.6]
-	// subject to the dragonberry vulnerability
-	// and/or the bank coin metadata migration issue
-	[v0.46.0, v0.46.4]
-	// subject to the dragonberry vulnerability
-	[v0.45.0, v0.45.8]
-	// do not use
-	v0.43.0
 )

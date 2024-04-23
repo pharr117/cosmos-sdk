@@ -158,7 +158,7 @@ func NewBaseApp(
 		logger:           logger,
 		name:             name,
 		db:               db,
-		cms:              store.NewCommitMultiStore(db),
+		cms:              store.NewCommitMultiStoreWithLogger(db, logger),
 		storeLoader:      DefaultStoreLoader,
 		grpcQueryRouter:  NewGRPCQueryRouter(),
 		msgServiceRouter: NewMsgServiceRouter(),
