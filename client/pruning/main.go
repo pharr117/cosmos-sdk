@@ -138,7 +138,6 @@ Supported app-db-backend types include 'goleveldb', 'rocksdb', 'pebbledb'.`,
 	cmd.Flags().Uint64(server.FlagPruningInterval, 10,
 		`Height interval at which pruned heights are removed from disk (ignored if pruning is not 'custom'), 
 		this is not used by this command but kept for compatibility with the complete pruning options`)
-	cmd.Flags().Uint64(server.FlagHeight, 1, `the height to begin with`)
 	return cmd
 }
 
