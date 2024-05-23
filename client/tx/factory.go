@@ -66,15 +66,8 @@ func NewFactoryCLI(clientCtx client.Context, flagSet *pflag.FlagSet) (Factory, e
 		signMode = signing.SignMode_SIGN_MODE_EIP_191
 	}
 
-	var accNum, accSeq uint64
-	if clientCtx.Offline {
-		if flagSet.Changed(flags.FlagAccountNumber) && flagSet.Changed(flags.FlagSequence) {
-			accNum, _ = flagSet.GetUint64(flags.FlagAccountNumber)
-			accSeq, _ = flagSet.GetUint64(flags.FlagSequence)
-		} else {
-			return Factory{}, errors.New("account-number and sequence must be set in offline mode")
-		}
-	}
+	accNum, _ := flagSet.GetUint64(flags.FlagAccountNumber)
+	accSeq, _ := flagSet.GetUint64(flags.FlagSequence)
 
 	gasAdj, _ := flagSet.GetFloat64(flags.FlagGasAdjustment)
 	memo, _ := flagSet.GetString(flags.FlagNote)
